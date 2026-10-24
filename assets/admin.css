@@ -1,0 +1,67 @@
+.sqa-wrap .nav-tab-wrapper { margin-top: 16px; }
+.sqa-tab { margin-top: 16px; }
+
+/* Status bar */
+.sqa-status { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin: 16px 0 0; padding: 12px 16px; background: #fff; border: 1px solid #c3c4c7; border-left-width: 4px; }
+.sqa-status.is-on { border-left-color: #00a32a; }
+.sqa-status.is-off { border-left-color: #8c8f94; }
+.sqa-status p { margin: 0; }
+.sqa-status form { display: flex; align-items: center; gap: 8px; margin: 0; }
+.sqa-dot { display: inline-block; width: 10px; height: 10px; margin-right: 6px; border-radius: 50%; background: #8c8f94; vertical-align: middle; }
+.sqa-status.is-on .sqa-dot { background: #00a32a; box-shadow: 0 0 0 3px rgba(0, 163, 42, .2); }
+
+/* Summary cards */
+.sqa-cards { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+.sqa-card { flex: 1 1 160px; padding: 12px 16px; background: #fff; border: 1px solid #c3c4c7; }
+.sqa-card-value { font-size: 22px; font-weight: 600; line-height: 1.3; }
+.sqa-card-label { color: #50575e; }
+.sqa-card-note { color: #646970; font-size: 12px; }
+
+.sqa-empty { padding: 24px; background: #fff; border: 1px dashed #c3c4c7; text-align: center; }
+
+/* Tables */
+.sqa-table th.num, .sqa-table td.num { text-align: right; white-space: nowrap; }
+.sqa-table td { vertical-align: top; }
+.sqa-sql-cell { max-width: 640px; }
+.sqa-sql { font-size: 12px; word-break: break-word; white-space: pre-wrap; background: transparent; padding: 0; }
+pre.sqa-sql-full { margin: 8px 0 0; padding: 8px 10px; max-height: 320px; overflow: auto; background: #f6f7f7; border: 1px solid #dcdcde; }
+.sqa-details summary { cursor: pointer; }
+.sqa-caller { margin-top: 4px; color: #646970; font-size: 11px; word-break: break-word; }
+.sqa-url { word-break: break-all; }
+.sqa-method { color: #646970; font-size: 11px; margin-right: 4px; }
+.sqa-bad { color: #b32d2e; font-weight: 600; }
+.sqa-null { color: #8c8f94; font-style: italic; }
+.sqa-toolbar .current { font-weight: 600; color: #1d2327; text-decoration: none; }
+.sqa-request-title { word-break: break-all; }
+
+/* Badges */
+.sqa-badge { display: inline-block; padding: 1px 6px; margin: 0 2px 2px 0; border-radius: 3px; font-size: 11px; line-height: 1.6; background: #f0f0f1; color: #2c3338; white-space: nowrap; }
+.sqa-src-plugin { background: #e5f0fa; color: #0a4b78; }
+.sqa-src-mu-plugin { background: #ede5fa; color: #4a2a7a; }
+.sqa-src-theme { background: #fcf0e3; color: #8a4600; }
+.sqa-src-core { background: #f0f0f1; color: #3c434a; }
+.sqa-ctx-front { background: #edfaef; color: #005c12; }
+.sqa-ctx-admin { background: #f0f0f1; }
+.sqa-ctx-ajax, .sqa-ctx-rest { background: #e5f0fa; color: #0a4b78; }
+
+/* Analysis */
+.sqa-analysis-row > td { background: #fbfbfc !important; }
+.sqa-analysis-body h4 { margin: 12px 0 6px; }
+.sqa-analysis-body h4:first-child { margin-top: 4px; }
+.sqa-hints { margin: 0; }
+.sqa-hint { margin: 6px 0; padding: 6px 10px; border-left: 4px solid #8c8f94; background: #fff; }
+.sqa-hint-high { border-left-color: #d63638; }
+.sqa-hint-medium { border-left-color: #dba617; }
+.sqa-hint-info { border-left-color: #72aee6; }
+.sqa-scroll { overflow-x: auto; }
+.sqa-explain th, .sqa-explain td { font-family: Consolas, Monaco, monospace; font-size: 12px; white-space: nowrap; }
+.sqa-spinner { float: none; margin: 0 6px 0 0; }
+
+/* Health */
+.sqa-health th { width: 220px; }
+.sqa-health-status { width: 80px; }
+.sqa-pill { display: inline-block; min-width: 56px; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; text-align: center; }
+.sqa-pill-ok { background: #edfaef; color: #005c12; }
+.sqa-pill-medium { background: #fcf9e8; color: #6e5100; }
+.sqa-pill-high { background: #fcf0f1; color: #8a2424; }
+.sqa-pill-info { background: #f0f6fc; color: #0a4b78; }

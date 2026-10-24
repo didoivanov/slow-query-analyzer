@@ -1,0 +1,103 @@
+name: Release
+
+# Every push to main publishes a new version: the patch number is bumped,
+# the version is written into the plugin files, and a GitHub release with
+# slow-query-analyzer.zip is created. WordPress sites running the plugin
+# then show the update under Plugins.
+#
+# Add "[skip release]" to a commit message to push without releasing.
+# Run the workflow manually (Actions → Release → Run workflow) for a minor/major bump.
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'README.md'
+      - '.gitignore'
+      - '.gitattributes'
+      - '.github/**'
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Which part of the version to bump
+        type: choice
+        options: [patch, minor, major]
+        default: patch
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: ${{ !contains(github.event.head_commit.message, '[skip release]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Work out the new version
+        id: version
+        env:
+          BUMP: ${{ inputs.bump || 'patch' }}
+        run: |
+          current=$(sed -n -E 's/^[[:space:]]*\*[[:space:]]*Version:[[:space:]]*([0-9.]+).*/\1/p' slow-query-analyzer.php | head -n1)
+          if git rev-parse -q --verify "refs/tags/v${current}" >/dev/null; then
+            IFS=. read -r major minor patch <<< "${current}"
+            case "${BUMP}" in
+              major) major=$((major + 1)); minor=0; patch=0 ;;
+              minor) minor=$((minor + 1)); patch=0 ;;
+              *)     patch=$((patch + 1)) ;;
+            esac
+            next="${major}.${minor}.${patch}"
+          else
+            # The version in the files hasn't been released yet: release it as is.
+            next="${current}"
+          fi
+          echo "previous=$(git describe --tags --abbrev=0 2>/dev/null || true)" >> "$GITHUB_OUTPUT"
+          echo "version=${next}" >> "$GITHUB_OUTPUT"
+          echo "Releasing ${next} (current ${current})"
+
+      - name: Write the version into the plugin
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          sed -i -E "s/^([[:space:]]*\*[[:space:]]*Version:[[:space:]]*).*/\1${VERSION}/" slow-query-analyzer.php
+          sed -i -E "s/define\( 'SQA_VERSION', '[^']*' \)/define( 'SQA_VERSION', '${VERSION}' )/" slow-query-analyzer.php
+          sed -i -E "s/^Stable tag:.*/Stable tag: ${VERSION}/" readme.txt
+          grep -q "define( 'SQA_VERSION', '${VERSION}' )" slow-query-analyzer.php
+
+      - name: Commit and tag
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet; then
+            git commit -am "Release v${VERSION} [skip release]"
+          fi
+          git tag "v${VERSION}"
+          git push origin "HEAD:${GITHUB_REF_NAME}" "v${VERSION}"
+
+      - name: Build the plugin zip
+        run: |
+          mkdir -p build/slow-query-analyzer
+          git archive HEAD | tar -x -C build/slow-query-analyzer
+          (cd build && zip -qr slow-query-analyzer.zip slow-query-analyzer)
+          unzip -l build/slow-query-analyzer.zip
+
+      - name: Publish the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+          PREVIOUS: ${{ steps.version.outputs.previous }}
+        run: |
+          range="HEAD"
+          if [ -n "${PREVIOUS}" ]; then range="${PREVIOUS}..HEAD"; fi
+          git log ${range} --no-merges --pretty='- %s' | grep -v '\[skip release\]' > notes.md || true
+          [ -s notes.md ] || echo "- Maintenance release" > notes.md
+          gh release create "v${VERSION}" build/slow-query-analyzer.zip --title "v${VERSION}" --notes-file notes.md
